@@ -19,8 +19,16 @@ client.on('ready', () => {
 client.on('message', message => {
     
     if (message.author.bot) return;
-    if (message.channel.id != "882868054852259850") return;
-    const sendChannel = message.guild.channels.cache.get("882868078461988865");
+    if (message.channel.id != "882868054852259850" || message.channel.id != "747748343119347783") return;
+    const key = client.guilds.cache.get("663590607981117452").channels.cache.get("747748343119347783");
+    const gifOutput = client.guilds.cache.get("882867988519321642").channels.cache.get("882868078461988865");
+    let sendChannel;
+    
+    if (message.channel.id === "882868054852259850") {
+        sendChannel = gifOutput;
+    } else  if (message.channel.id === "747748343119347783") {
+        sendChannel = key;
+    }
 
     const args = message.content;
     
