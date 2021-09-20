@@ -18,6 +18,7 @@ client.on('ready', () => {
 
 client.on('message', message => {
     
+    if (message.author.id === "889356197700993104") return;
     if(message.author.bot && message.webhookId != null) return;
     
     let sendChannel;
