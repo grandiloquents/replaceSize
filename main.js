@@ -24,7 +24,7 @@ client.on('message', message => {
     let sendChannel;
     
     if (message.channel.id === "882868054852259850") {
-        sendChannel = message.guild.channels.cache.get("888275489255456808");
+        sendChannel = message.guild.channels.cache.get("882868078461988865");
     } else  if (message.channel.id === "747748343119347783") {
         sendChannel = message.guild.channels.cache.get("747748343119347783");
     } else return;
