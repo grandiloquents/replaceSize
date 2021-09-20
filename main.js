@@ -19,16 +19,14 @@ client.on('ready', () => {
 client.on('message', message => {
     
     if (message.author.bot) return;
-    if (message.channel.id != "882868054852259850" || message.channel.id != "747748343119347783") return;
-    const key = client.guilds.cache.get("663590607981117452").channels.cache.get("747748343119347783");
-    const gifOutput = client.guilds.cache.get("882867988519321642").channels.cache.get("882868078461988865");
+    
     let sendChannel;
     
     if (message.channel.id === "882868054852259850") {
-        sendChannel = gifOutput;
+        sendChannel = message.guild.channels.cache.get("882868078461988865");
     } else  if (message.channel.id === "747748343119347783") {
-        sendChannel = key;
-    }
+        sendChannel = message.guild.channels.cache.get("747748343119347783");
+    } else return;
 
     const args = message.content;
     
@@ -36,7 +34,7 @@ client.on('message', message => {
         let index = args.indexOf('?');
         index+=1;
         const delet = args.substring(0, index);
-        sendChannel.channel.send(`${delet}size=40`);
+        sendChannel.send(`${delet}size=40`);
     }
 
     if (args.startsWith("<:") || args.startsWith("<a:")) {
@@ -45,10 +43,10 @@ client.on('message', message => {
       
         if (emoji = emoteRegex.exec(args)) {
             const url = `https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=40`;
-            sendChannel.channel.send(url)
+            sendChannel.send(url)
         } else if (emoji = animatedEmoteRegex.exec(args)) {
             const url = `https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=40`;
-            sendChannel.channel.send(url)
+            sendChannel.send(url)
         } else {
             return;
         }
