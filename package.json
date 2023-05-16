@@ -1,5 +1,5 @@
 {
-  "name": "replacesize",
+  "name": "new-folder",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -10,8 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/voice": "^0.6.0",
-    "discord.js": "^12.5.3",
-    "nodemon": "^2.0.12"
+    "discord.js": "^14.11.0",
+    "filesystem": "^1.0.1",
+    "fs": "^0.0.1-security",
+    "nodemon": "^2.0.22"
   }
 }
