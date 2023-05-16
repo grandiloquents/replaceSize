@@ -1,59 +1,49 @@
-const Discord = require('discord.js');
-const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-const config = require('./config.json');
+const fs = require('node:fs');
+const path = require('node:path');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { token } = require('./config.json');
 
-client.on('ready', () => {
-    console.log("bot is online!");
-    client.user.setPresence(
-        {
-            activity: {
-                name: "with links",
-                type: "PLAYING"
-              },
-            status: 'dnd',
-        }
-    )
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.commands = new Collection();
+const foldersPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(foldersPath);
+
+for (const folder of commandFolders) {
+	const commandsPath = path.join(foldersPath, folder);
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const filePath = path.join(commandsPath, file);
+		const command = require(filePath);
+		if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
+	}
+}
+
+client.once(Events.ClientReady, () => {
+	console.log('Ready!');
 });
 
-client.on('message', message => {
-    
-    if (message.author.id === "889356197700993104") return;
-    if(message.author.bot && message.webhookId != null) return;
-    
-    let sendChannel;
-    
-    if (message.channel.id === "882868054852259850") {
-        sendChannel = message.guild.channels.cache.get("882868078461988865");
-    } else  if (message.channel.id === "747748343119347783") {
-        sendChannel = message.guild.channels.cache.get("747748343119347783");
-    } else return;
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isChatInputCommand()) return;
 
-    const args = message.content;
-    
-    if (args.startsWith("https://cdn.discordapp.com/emojis/")) {
-        let index = args.indexOf('?');
-        index+=1;
-        const delet = args.substring(0, index);
-        sendChannel.send(`${delet}size=40`);
-    }
+	const command = client.commands.get(interaction.commandName);
 
-    if (args.startsWith("<:") || args.startsWith("<a:")) {
-        const emoteRegex = /<:.+:(\d+)>/gm
-        const animatedEmoteRegex = /<a:.+:(\d+)>/gm
-      
-        if (emoji = emoteRegex.exec(args)) {
-            const url = `https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=40`;
-            sendChannel.send(url)
-        } else if (emoji = animatedEmoteRegex.exec(args)) {
-            const url = `https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=40`;
-            sendChannel.send(url)
-        } else {
-            return;
-        }
+	if (!command) return;
 
-    }
-
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		} else {
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}
 });
 
-client.login(config.token);
+client.login(token);
